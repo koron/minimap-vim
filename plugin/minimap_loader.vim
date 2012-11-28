@@ -8,3 +8,12 @@
 "   - (C) 2012 MURAOKA Taro (koron.kaoriya@gmail.com)
 
 scriptencoding utf-8
+
+if v:servername =~? 'minimap'
+  augroup minimap
+    autocmd!
+    autocmd VimEnter * call minimap#_on_open()
+  augroup END
+else
+  command! MinimapSync call minimap#sync()
+endif

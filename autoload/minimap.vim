@@ -59,7 +59,7 @@ function! minimap#_on_recv(data)
   let path = data['path']
   let file = substitute(expand('%:p'), '\\', '/', 'g')
   if file !=# path
-    execute 'view! ' . path
+    silent execute 'view! ' . path
   endif
   if file ==# path
     let col = data['col']
@@ -73,10 +73,10 @@ function! minimap#_on_recv(data)
     let p1 = printf('\%%>%dl\%%<%dl', start - 1, curr)
     let p2 = printf('\%%>%dl\%%<%dl', curr, end + 1)
     let p2 = '\%>' . curr . 'l\%<' . end . 'l'
-    execute printf('match Search /\(%s\|%s\).*/', p1, p2)
+    silent execute printf('match Search /\(%s\|%s\).*/', p1, p2)
     " move cursor
     call cursor(curr, col)
-    redraw!
+    redraw
   endif
 endfunction
 

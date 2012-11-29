@@ -34,7 +34,7 @@ endfunction
 
 function! minimap#_send(id)
   let data = { 
-        \ 'path': expand('%:p'),
+        \ 'path': substitute(expand('%:p'), '\\', '/', 'g'),
         \ 'line': line('.'),
         \ 'col': col('.'),
         \ 'start': line('w0'),
@@ -57,10 +57,11 @@ endfunction
 function! minimap#_on_recv(data)
   let data = eval(a:data)
   let path = data['path']
-  if expand('%:p') !=# path
+  let file = substitute(expand('%:p'), '\\', '/', 'g')
+  if file !=# path
     execute 'view! ' . path
   endif
-  if expand('%:p') ==# path
+  if file ==# path
     let col = data['col']
     let start = data['start']
     let curr = data['line']

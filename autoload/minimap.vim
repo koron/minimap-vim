@@ -46,7 +46,7 @@ endfunction
 
 function! minimap#_on_open()
   set guioptions= laststatus=0 cmdheight=1 nowrap
-  set columns=80 foldcolumn=2
+  set columns=80 foldcolumn=0
   set cursorline
   set guifont=MS_Gothic:h3:cSHIFTJIS
   hi clear CursorLine

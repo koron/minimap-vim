@@ -10,6 +10,7 @@
 scriptencoding utf-8
 
 let s:minimap_id = 'minimap'
+let s:minimap_syncing = 0
 
 function! minimap#_is_open(id)
   let servers = split(serverlist(), '\n', 0)
@@ -57,9 +58,12 @@ endfunction
 function! minimap#_on_recv(data)
   let data = eval(a:data)
   let path = data['path']
+  if len(path) == 0
+    return
+  endif
   let file = substitute(expand('%:p'), '\\', '/', 'g')
   if file !=# path
-    silent execute 'view! ' . path
+    execute 'view! ' . path
   endif
   if file ==# path
     let col = data['col']
@@ -81,32 +85,51 @@ function! minimap#_on_recv(data)
 endfunction
 
 function! minimap#_set_autosync()
+  let s:minimap_syncing = 1
   augroup minimap_auto
     autocmd!
     autocmd CursorMoved * call minimap#_sync()
   augroup END
 endfunction
 
+function! minimap#_unset_autosync()
+  let s:minimap_syncing = 0
+  augroup minimap_auto
+    autocmd!
+  augroup END
+endfunction
+
 function! minimap#_sync()
-  if len(expand('%:p')) == 0
-    return
-  endif
   let id = s:minimap_id
   if minimap#_is_open(id) == 0
     call minimap#_open(id)
     call minimap#_wait(id)
-    call minimap#_set_autosync()
     call foreground()
   endif
   call minimap#_send(id)
+  if s:minimap_syncing == 0
+    call minimap#_start()
+  endif
 endfunction
 
-function! minimap#sync()
-  if len(expand('%:p')) == 0
-    echohl Error
-    echo 'Open a valid file then retry :MinimapSync'
-    echohl None
-    return
+function! minimap#_delete_command(cmd)
+  if exists(':' . a:cmd)
+    execute 'delcommand ' . a:cmd
   endif
-  call minimap#_sync()
+endfunction
+
+function! minimap#_start()
+  call minimap#_set_autosync()
+  call minimap#_delete_command('MinimapSync')
+  command! MinimapStop call minimap#_stop()
+endfunction
+
+function! minimap#_stop()
+  call minimap#_unset_autosync()
+  call minimap#_delete_command('MinimapStop')
+  command! MinimapSync call minimap#_sync()
+endfunction
+
+function! minimap#init()
+  command! MinimapSync call minimap#_sync()
 endfunction

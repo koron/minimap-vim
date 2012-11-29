@@ -15,5 +15,5 @@ if v:servername =~? 'minimap'
     autocmd VimEnter * call minimap#_on_open()
   augroup END
 else
-  command! MinimapSync call minimap#sync()
+  call minimap#init()
 endif

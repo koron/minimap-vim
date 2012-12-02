@@ -9,11 +9,7 @@
 
 scriptencoding utf-8
 
-if v:servername =~? 'minimap'
-  augroup minimap
-    autocmd!
-    autocmd VimEnter * call minimap#_on_open()
-  augroup END
-else
-  call minimap#init()
-endif
+augroup minimap_loader
+  autocmd!
+  autocmd VimEnter * call minimap#init()
+augroup END

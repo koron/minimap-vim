@@ -160,5 +160,9 @@ function! minimap#_stop()
 endfunction
 
 function! minimap#init()
-  command! MinimapSync call minimap#_sync()
+  if v:servername =~? s:minimap_id
+    call minimap#_on_open()
+  else
+    command! MinimapSync call minimap#_sync()
+  endif
 endfunction

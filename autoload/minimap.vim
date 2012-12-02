@@ -10,7 +10,7 @@
 scriptencoding utf-8
 
 let s:minimap_id = 'MINIMAP'
-let s:minimap_syncing = 0
+let s:minimap_mode = 0
 
 function! minimap#_is_open(id)
   let servers = split(serverlist(), '\n', 0)
@@ -47,6 +47,7 @@ endfunction
 
 function! minimap#_send(id)
   let data = { 
+        \ 'sender': v:servername,
         \ 'path': minimap#_get_current_path(),
         \ 'line': line('.'),
         \ 'col': col('.'),
@@ -125,7 +126,7 @@ function! minimap#_set_view_range(line, col, start, end)
 endfunction
 
 function! minimap#_set_autosync()
-  let s:minimap_syncing = 1
+  let s:minimap_mode = 1
   augroup minimap_auto
     autocmd!
     autocmd CursorMoved * call minimap#_sync()
@@ -133,10 +134,17 @@ function! minimap#_set_autosync()
 endfunction
 
 function! minimap#_unset_autosync()
-  let s:minimap_syncing = 0
+  let s:minimap_mode = 0
   augroup minimap_auto
     autocmd!
   augroup END
+endfunction
+
+function! minimap#_send_and_enter_minimap_mode(id)
+  call minimap#_send(a:id)
+  if s:minimap_mode == 0
+    call minimap#_enter_minimap_mode()
+  endif
 endfunction
 
 function! minimap#_sync()
@@ -144,20 +152,13 @@ function! minimap#_sync()
   if minimap#_is_open(id) == 0
     call minimap#_open(id, v:servername)
   else
-    call minimap#_sync2(id)
-  endif
-endfunction
-
-function! minimap#_sync2(id)
-  call minimap#_send(a:id)
-  if s:minimap_syncing == 0
-    call minimap#_start()
+    call minimap#_send_and_enter_minimap_mode(id)
   endif
 endfunction
 
 function! minimap#_ack_open(id)
   call foreground()
-  call minimap#_sync2(a:id)
+  call minimap#_send_and_enter_minimap_mode(a:id)
 endfunction
 
 function! minimap#_delete_command(cmd)
@@ -166,13 +167,13 @@ function! minimap#_delete_command(cmd)
   endif
 endfunction
 
-function! minimap#_start()
+function! minimap#_enter_minimap_mode()
   call minimap#_set_autosync()
   call minimap#_delete_command('MinimapSync')
-  command! MinimapStop call minimap#_stop()
+  command! MinimapStop call minimap#_leave_minimap_mode()
 endfunction
 
-function! minimap#_stop()
+function! minimap#_leave_minimap_mode()
   call minimap#_unset_autosync()
   call minimap#_delete_command('MinimapStop')
   command! MinimapSync call minimap#_sync()

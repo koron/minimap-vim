@@ -74,7 +74,7 @@ function! minimap#_on_open()
   set lines=999
 endfunction
 
-function minimap#_set_small_font()
+function! minimap#_set_small_font()
   if has('gui_macvim')
     set noantialias
     set guifont=Osaka-Mono:h3

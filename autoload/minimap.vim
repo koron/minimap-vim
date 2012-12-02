@@ -18,6 +18,24 @@ function! minimap#_is_open(id)
 endfunction
 
 function! minimap#_open(id)
+  if has('gui_macvim')
+    call minimap#_open_macvim(a:id)
+  else
+    call minimap#_open_others(a:id)
+  endif
+endfunction
+
+function! minimap#_open_macvim(id)
+  let macvim_dir = $VIM . '/../../../..'
+  let cmd_args = [
+        \ macvim_dir . '/MacVim.app/Contents/MacOS/Vim',
+        \ '-g',
+        \ '--servername', a:id,
+        \ ]
+  silent execute '!'.join(cmd_args, ' ')
+endfunction
+
+function! minimap#_open_others(id)
   let args = [
         \ 'gvim',
         \ '--servername', a:id,
@@ -26,7 +44,7 @@ function! minimap#_open(id)
 endfunction
 
 function! minimap#_wait(id)
-  " FIXME: improve wait logic
+  " TODO: improve wait logic
   while minimap#_is_open(a:id) != 0
     sleep 100m
   endwhile
@@ -45,14 +63,25 @@ function! minimap#_send(id)
 endfunction
 
 function! minimap#_on_open()
+  call minimap#_set_small_font()
   set guioptions= laststatus=0 cmdheight=1 nowrap
   set columns=80 foldcolumn=0
   set cursorline
-  set guifont=MS_Gothic:h3:cSHIFTJIS
   hi clear CursorLine
   hi link CursorLine Cursor
   winpos 0 0
   set lines=999
+endfunction
+
+function minimap#_set_small_font()
+  if has('gui_macvim')
+    set noantialias
+    set guifont=Osaka-Mono:h3
+  elseif has('gui_win32')
+    set guifont=MS_Gothic:h3:cSHIFTJIS
+  else
+    " TODO: for other platforms.
+  endif
 endfunction
 
 function! minimap#_on_recv(data)

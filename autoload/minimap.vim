@@ -66,6 +66,7 @@ function! minimap#_on_open()
   call minimap#_set_small_font()
   set guioptions= laststatus=0 cmdheight=1 nowrap
   set columns=80 foldcolumn=0
+  set scrolloff=0
   set cursorline
   hi clear CursorLine
   hi link CursorLine Cursor
@@ -99,9 +100,13 @@ function! minimap#_on_recv(data)
     let start = data['start']
     let curr = data['line']
     let end = data['end']
-    " TODO: ensure to show view range.
-    call cursor(start, col)
-    call cursor(end, col)
+    " ensure to show view range.
+    if start < line('w0')
+      silent execute printf('normal! %dGzt', start)
+    endif
+    if end > line('w$')
+      silent execute printf('normal! %dGzb', end)
+    endif
     " mark view range.
     let p1 = printf('\%%>%dl\%%<%dl', start - 1, curr)
     let p2 = printf('\%%>%dl\%%<%dl', curr, end + 1)

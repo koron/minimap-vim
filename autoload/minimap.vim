@@ -76,7 +76,6 @@ function! minimap#_on_recv(data)
     " mark view range.
     let p1 = printf('\%%>%dl\%%<%dl', start - 1, curr)
     let p2 = printf('\%%>%dl\%%<%dl', curr, end + 1)
-    let p2 = '\%>' . curr . 'l\%<' . end . 'l'
     silent execute printf('match Search /\(%s\|%s\).*/', p1, p2)
     " move cursor
     call cursor(curr, col)

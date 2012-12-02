@@ -71,8 +71,8 @@ function! minimap#_on_open()
 
   " send ACK for open.
   if exists('g:minimap_ack')
-    let expr = printf('minimap#_ack_open("%s")', v:servername)
-    call remote_expr(g:minimap_ack, expr)
+    let expr = printf(':call minimap#_ack_open("%s")<CR>', v:servername)
+    call remote_send(g:minimap_ack, expr)
     unlet g:minimap_ack
   endif
 endfunction
@@ -98,7 +98,6 @@ function! minimap#_on_recv(data)
   if len(path) == 0
     return
   endif
-  let file = substitute(expand('%:p'), '\\', '/', 'g')
   if path !=# minimap#_get_current_path()
     execute 'view! ' . path
   endif

@@ -133,7 +133,7 @@ endfunction
 
 function! s:minimap_queue_do()
   if len(s:minimap_queue)
-    let id = remove(s:minimap_queue, -1)
+    call remove(s:minimap_queue, -1)
     if len(s:minimap_queue) == 0
       call minimap#_sync_do()
     endif

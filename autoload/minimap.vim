@@ -127,15 +127,15 @@ endfunction
 let s:minimap_queue = []
 
 function! s:minimap_queue_push()
-  call add(s:minimap_queue, getpos("."))
+  call add(s:minimap_queue, 1)
   call feedkeys("\<plug>(minimap-queue-do)", 'm')
 endfunction
 
 function! s:minimap_queue_do()
   if len(s:minimap_queue)
-    let item = remove(s:minimap_queue, -1)
+    let id = remove(s:minimap_queue, -1)
     if len(s:minimap_queue) == 0
-      call minimap#_sync()
+      call minimap#_sync_do()
     endif
   endif
   return ''
@@ -145,7 +145,7 @@ function! minimap#_set_autosync()
   let s:minimap_mode = 1
   augroup minimap_auto
     autocmd!
-    autocmd CursorMoved,CursorMovedI * call s:minimap_queue_push()
+    autocmd CursorMoved,CursorMovedI * call minimap#_sync()
   augroup END
   nnoremap <silent> <plug>(minimap-queue-do) :call <sid>minimap_queue_do()<cr>
   inoremap <silent> <plug>(minimap-queue-do) <c-r>=<sid>minimap_queue_do()<cr>
@@ -165,12 +165,20 @@ function! minimap#_send_and_enter_minimap_mode(id)
   endif
 endfunction
 
-function! minimap#_sync()
+function! minimap#_sync_do()
   let id = s:minimap_id
   if minimap#_is_open(id) == 0
     call minimap#_open(id, v:servername)
   else
     call minimap#_send_and_enter_minimap_mode(id)
+  endif
+endfunction
+
+function! minimap#_sync()
+  if s:minimap_mode == 1
+    call s:minimap_queue_push()
+  else
+    call minimap#_sync_do()
   endif
 endfunction
 

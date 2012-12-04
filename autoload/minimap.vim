@@ -10,7 +10,7 @@
 scriptencoding utf-8
 
 let s:minimap_id = 'MINIMAP'
-let s:minimap_mode = 0
+let s:minimap_mode = get(s:, 'minimap_mode', 0)
 
 function! minimap#_is_open(id)
   let servers = split(serverlist(), '\n', 0)
@@ -128,7 +128,8 @@ function! minimap#_set_autosync()
   let s:minimap_mode = 1
   augroup minimap_auto
     autocmd!
-    autocmd CursorMoved * call minimap#_sync()
+    autocmd CursorMoved * call minimap#_lazysync()
+    autocmd CursorMovedI * call minimap#_lazysync()
   augroup END
 endfunction
 
@@ -153,6 +154,23 @@ function! minimap#_sync()
   else
     call minimap#_send_and_enter_minimap_mode(id)
   endif
+endfunction
+
+let s:lazysync_count = get(s:, 'lazysync_count', 0)
+
+function! minimap#_lazysync()
+  let s:lazysync_count += 1
+  call feedkeys("\<Plug>(lazysync-do)", 'm')
+endfunction
+
+function! minimap#_lazysync_do()
+  if s:lazysync_count > 0
+    let s:lazysync_count -= 1
+    if s:lazysync_count == 0
+      call minimap#_sync()
+    endif
+  endif
+  return ''
 endfunction
 
 function! minimap#_ack_open(id)
@@ -183,5 +201,7 @@ function! minimap#init()
     call minimap#_on_open()
   else
     command! MinimapSync call minimap#_sync()
+    nnoremap <silent> <Plug>(lazysync-do) :call minimap#_lazysync_do()<CR>
+    inoremap <silent> <Plug>(lazysync-do) <C-R>=minimap#_lazysync_do()<CR>
   endif
 endfunction

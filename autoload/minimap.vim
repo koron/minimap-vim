@@ -124,29 +124,12 @@ function! minimap#_set_view_range(line, col, start, end)
   redraw
 endfunction
 
-let s:minimap_sync_queue = get(s:, 'minimap_sync_queue', [])
-
-function! s:minimap_sync_queue_push()
-  call add(s:minimap_sync_queue, 1)
-  call feedkeys("\<plug>(minimap-sync-queue-do)", 'm')
-endfunction
-
-function! s:minimap_sync_queue_do()
-  if len(s:minimap_sync_queue)
-    call remove(s:minimap_sync_queue, 0)
-    if len(s:minimap_sync_queue) == 0
-      call minimap#_sync()
-    endif
-  endif
-  return ''
-endfunction
-
 function! minimap#_set_autosync()
   let s:minimap_mode = 1
   augroup minimap_auto
     autocmd!
     autocmd CursorMoved * call minimap#_lazysync()
-    "autocmd CursorMovedI * call minimap#_lazysync()
+    autocmd CursorMovedI * call minimap#_lazysync()
   augroup END
 endfunction
 
@@ -173,8 +156,21 @@ function! minimap#_sync()
   endif
 endfunction
 
+let s:lazysync_count = get(s:, 'lazysync_count', 0)
+
 function! minimap#_lazysync()
-  call s:minimap_sync_queue_push()
+  let s:lazysync_count += 1
+  call feedkeys("\<Plug>(lazysync-do)", 'm')
+endfunction
+
+function! minimap#_lazysync_do()
+  if s:lazysync_count > 0
+    let s:lazysync_count -= 1
+    if s:lazysync_count == 0
+      call minimap#_sync()
+    endif
+  endif
+  return ''
 endfunction
 
 function! minimap#_ack_open(id)
@@ -205,7 +201,7 @@ function! minimap#init()
     call minimap#_on_open()
   else
     command! MinimapSync call minimap#_sync()
-    nnoremap <silent> <plug>(minimap-sync-queue-do) :call <sid>minimap_sync_queue_do()<cr>
-    inoremap <silent> <plug>(minimap-sync-queue-do) <c-r>=<sid>minimap_sync_queue_do()<cr>
+    nnoremap <silent> <Plug>(lazysync-do) :call minimap#_lazysync_do()<CR>
+    inoremap <silent> <Plug>(lazysync-do) <C-R>=minimap#_lazysync_do()<CR>
   endif
 endfunction

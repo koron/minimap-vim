@@ -10,7 +10,7 @@
 scriptencoding utf-8
 
 let s:minimap_id = 'MINIMAP'
-let s:minimap_mode = 0
+let s:minimap_mode = get(s:, 'minimap_mode', 0)
 
 function! minimap#_is_open(id)
   let servers = split(serverlist(), '\n', 0)
@@ -124,17 +124,17 @@ function! minimap#_set_view_range(line, col, start, end)
   redraw
 endfunction
 
-let s:minimap_queue = []
+let s:minimap_sync_queue = get(s:, 'minimap_sync_queue', [])
 
-function! s:minimap_queue_push()
-  call add(s:minimap_queue, 1)
-  call feedkeys("\<plug>(minimap-queue-do)", 'm')
+function! s:minimap_sync_queue_push()
+  call add(s:minimap_sync_queue, 1)
+  call feedkeys("\<plug>(minimap-sync-queue-do)", 'm')
 endfunction
 
-function! s:minimap_queue_do()
-  if len(s:minimap_queue)
-    call remove(s:minimap_queue, -1)
-    if len(s:minimap_queue) == 0
+function! s:minimap_sync_queue_do()
+  if len(s:minimap_sync_queue)
+    call remove(s:minimap_sync_queue, 0)
+    if len(s:minimap_sync_queue) == 0
       call minimap#_sync_do()
     endif
   endif
@@ -147,8 +147,8 @@ function! minimap#_set_autosync()
     autocmd!
     autocmd CursorMoved,CursorMovedI * call minimap#_sync()
   augroup END
-  nnoremap <silent> <plug>(minimap-queue-do) :call <sid>minimap_queue_do()<cr>
-  inoremap <silent> <plug>(minimap-queue-do) <c-r>=<sid>minimap_queue_do()<cr>
+  nnoremap <silent> <plug>(minimap-sync-queue-do) :call <sid>minimap_sync_queue_do()<cr>
+  inoremap <silent> <plug>(minimap-sync-queue-do) <c-r>=<sid>minimap_sync_queue_do()<cr>
 endfunction
 
 function! minimap#_unset_autosync()
@@ -176,7 +176,7 @@ endfunction
 
 function! minimap#_sync()
   if s:minimap_mode == 1
-    call s:minimap_queue_push()
+    call s:minimap_sync_queue_push()
   else
     call minimap#_sync_do()
   endif

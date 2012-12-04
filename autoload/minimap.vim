@@ -124,12 +124,31 @@ function! minimap#_set_view_range(line, col, start, end)
   redraw
 endfunction
 
+let s:minimap_queue = []
+
+function! s:minimap_queue_push()
+  call add(s:minimap_queue, getpos("."))
+  call feedkeys("\<plug>(minimap-queue-do)", 'm')
+endfunction
+
+function! s:minimap_queue_do()
+  if len(s:minimap_queue)
+    let item = remove(s:minimap_queue, -1)
+    if len(s:minimap_queue) == 0
+      call minimap#_sync()
+    endif
+  endif
+  return ''
+endfunction
+
 function! minimap#_set_autosync()
   let s:minimap_mode = 1
   augroup minimap_auto
     autocmd!
-    autocmd CursorMoved * call minimap#_sync()
+    autocmd CursorMoved,CursorMovedI * call s:minimap_queue_push()
   augroup END
+  nnoremap <silent> <plug>(minimap-queue-do) :call <sid>minimap_queue_do()<cr>
+  inoremap <silent> <plug>(minimap-queue-do) <c-r>=<sid>minimap_queue_do()<cr>
 endfunction
 
 function! minimap#_unset_autosync()

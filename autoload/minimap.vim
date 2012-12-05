@@ -42,7 +42,11 @@ function! minimap#_open_others(id, ack)
         \ '--servername', a:id,
         \ '-c', printf("\"let g:minimap_ack=\'%s\'\"", a:ack),
         \ ]
-  silent execute '!start '.join(args, ' ')
+  if has('win32') || has('win64')
+    silent execute '!start '.join(args, ' ')
+  else
+    silent execute '!'.join(args, ' ').' &'
+  endif
 endfunction
 
 function! minimap#_send(id)
@@ -83,6 +87,8 @@ function! minimap#_set_small_font()
     set guifont=Osaka-Mono:h3
   elseif has('gui_win32')
     set guifont=MS_Gothic:h3:cSHIFTJIS
+  elseif has('gui_gtk2')
+    set guifont=Monospace\ 3
   else
     " TODO: for other platforms.
   endif

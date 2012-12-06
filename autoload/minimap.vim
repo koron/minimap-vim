@@ -85,7 +85,9 @@ function! minimap#_on_open()
   if exists('g:minimap_ack')
     let expr = printf(':call minimap#_ack_open("%s")<CR>', v:servername)
     call remote_send(g:minimap_ack, expr)
-    call remote_foreground(g:minimap_ack)
+    if !has('gui_macvim')
+      call remote_foreground(g:minimap_ack)
+    endif
     unlet g:minimap_ack
   endif
 endfunction
@@ -189,6 +191,9 @@ function! minimap#_lazysync_do()
 endfunction
 
 function! minimap#_ack_open(id)
+  if has('gui_macvim')
+    call foreground()
+  endif
   call minimap#_send_and_enter_minimap_mode(a:id)
 endfunction
 

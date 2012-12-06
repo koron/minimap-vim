@@ -109,6 +109,16 @@ function! minimap#_get_current_path()
   return substitute(expand('%:p'), '\\', '/', 'g')
 endfunction
 
+function! minimap#_remote_pull_sync(id)
+  let keys = printf(':call minimap#_pull_sync("%s")<CR>', v:servername)
+  call remote_send(a:id, keys)
+endfunction
+
+function! minimap#_pull_sync(id)
+  echo printf('minimap: update required by %s', a:id)
+  " TODO:
+endfunction
+
 function! minimap#_on_recv(data)
   let data = eval(a:data)
   let path = data['path']

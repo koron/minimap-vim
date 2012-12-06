@@ -20,6 +20,8 @@ endfunction
 function! minimap#_open(id, ack)
   if has('gui_macvim')
     call minimap#_open_macvim(a:id, a:ack)
+  elseif has('win32') || has('win64')
+    call minimap#_open_win(a:id, a:ack)
   else
     call minimap#_open_others(a:id, a:ack)
   endif
@@ -36,17 +38,23 @@ function! minimap#_open_macvim(id, ack)
   silent execute '!'.join(cmd_args, ' ')
 endfunction
 
-function! minimap#_open_others(id, ack)
+function! minimap#_open_win(id, ack)
   let args = [
         \ 'gvim',
         \ '--servername', a:id,
         \ '-c', printf("\"let g:minimap_ack=\'%s\'\"", a:ack),
         \ ]
-  if has('win32') || has('win64')
-    silent execute '!start '.join(args, ' ')
-  else
-    silent execute '!'.join(args, ' ').' &'
-  endif
+  silent execute '!start '.join(args, ' ')
+endfunction
+
+function! minimap#_open_others(id, ack)
+  let args = [
+        \ 'gvim',
+        \ '--servername', a:id,
+        \ '-c', printf("\"let g:minimap_ack=\'%s\'\"", a:ack),
+        \ '&',
+        \ ]
+  silent execute '!'.join(args, ' ')
 endfunction
 
 function! minimap#_send(id)

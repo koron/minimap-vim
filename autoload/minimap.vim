@@ -57,8 +57,8 @@ function! minimap#_open_others(id, ack)
   silent execute '!'.join(args, ' ')
 endfunction
 
-function! minimap#_send(id)
-  let data = { 
+function! minimap#_capture()
+  return {
         \ 'sender': v:servername,
         \ 'path': minimap#_get_current_path(),
         \ 'line': line('.'),
@@ -66,7 +66,12 @@ function! minimap#_send(id)
         \ 'start': line('w0'),
         \ 'end': line('w$'),
         \ }
-  call remote_expr(a:id, 'minimap#_on_recv("' . string(data) . '")')
+endfunction
+
+function! minimap#_send(id)
+  let data = minimap#_capture()
+  let expr = printf('minimap#_on_recv("%s")', string(data))
+  call remote_expr(a:id, expr)
 endfunction
 
 function! minimap#_on_open()
@@ -116,12 +121,18 @@ endfunction
 
 function! minimap#_pull_sync(id)
   echo printf('minimap: update required by %s', a:id)
-  " TODO:
+  let data = eval(remote_expr(a:id, 'string(minimap#_capture())'))
+  if len(data)
+    call minimap#_apply(data)
+  endif
 endfunction
 
 function! minimap#_on_recv(data)
-  let data = eval(a:data)
-  let path = data['path']
+  call minimap#_apply(eval(a:data))
+endfunction
+
+function! minimap#_apply(data)
+  let path = a:data['path']
   if len(path) == 0
     return
   endif
@@ -129,8 +140,8 @@ function! minimap#_on_recv(data)
     execute 'view! ' . path
   endif
   if path ==# minimap#_get_current_path()
-    call minimap#_set_view_range(data['line'], data['col'],
-          \ data['start'], data['end'])
+    call minimap#_set_view_range(a:data['line'], a:data['col'],
+          \ a:data['start'], a:data['end'])
   endif
 endfunction
 
@@ -168,7 +179,8 @@ function! minimap#_unset_autosync()
 endfunction
 
 function! minimap#_send_and_enter_minimap_mode(id)
-  call minimap#_send(a:id)
+  "call minimap#_send(a:id)
+  call minimap#_remote_pull_sync(a:id)
   if s:minimap_mode == 0
     call minimap#_enter_minimap_mode()
   endif

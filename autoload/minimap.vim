@@ -114,14 +114,21 @@ function! minimap#_get_current_path()
   return substitute(expand('%:p'), '\\', '/', 'g')
 endfunction
 
+let s:cached_sync_data = ''
+
+function! minimap#_sync_data()
+  return s:cached_sync_data
+endfunction
+
 function! minimap#_remote_pull_sync(id)
+  let s:cached_sync_data = string(minimap#_capture())
   let keys = printf(':call minimap#_pull_sync("%s")<CR>', v:servername)
   call remote_send(a:id, keys)
 endfunction
 
 function! minimap#_pull_sync(id)
   echo printf('minimap: update required by %s', a:id)
-  let data = eval(remote_expr(a:id, 'string(minimap#_capture())'))
+  let data = eval(remote_expr(a:id, 'minimap#_sync_data()'))
   if len(data)
     call minimap#_apply(data)
   endif

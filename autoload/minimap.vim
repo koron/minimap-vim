@@ -68,12 +68,6 @@ function! minimap#_capture()
         \ }
 endfunction
 
-function! minimap#_send(id)
-  let data = minimap#_capture()
-  let expr = printf('minimap#_on_recv("%s")', string(data))
-  call remote_expr(a:id, expr)
-endfunction
-
 function! minimap#_on_open()
   " setup view parameters.
   call minimap#_set_small_font()
@@ -134,10 +128,6 @@ function! minimap#_pull_sync(id)
   endif
 endfunction
 
-function! minimap#_on_recv(data)
-  call minimap#_apply(eval(a:data))
-endfunction
-
 function! minimap#_apply(data)
   let path = a:data['path']
   if len(path) == 0
@@ -186,7 +176,6 @@ function! minimap#_unset_autosync()
 endfunction
 
 function! minimap#_send_and_enter_minimap_mode(id)
-  "call minimap#_send(a:id)
   call minimap#_remote_pull_sync(a:id)
   if s:minimap_mode == 0
     call minimap#_enter_minimap_mode()
@@ -200,23 +189,6 @@ function! minimap#_sync()
   else
     call minimap#_send_and_enter_minimap_mode(id)
   endif
-endfunction
-
-let s:lazysync_count = get(s:, 'lazysync_count', 0)
-
-function! minimap#_lazysync()
-  let s:lazysync_count += 1
-  call feedkeys("\<Plug>(lazysync-do)", 'm')
-endfunction
-
-function! minimap#_lazysync_do()
-  if s:lazysync_count > 0
-    let s:lazysync_count -= 1
-    if s:lazysync_count == 0
-      call minimap#_sync()
-    endif
-  endif
-  return ''
 endfunction
 
 function! minimap#_ack_open(id)
@@ -249,7 +221,5 @@ function! minimap#init()
     call minimap#_on_open()
   else
     command! MinimapSync call minimap#_sync()
-    nnoremap <silent> <Plug>(lazysync-do) :call minimap#_lazysync_do()<CR>
-    inoremap <silent> <Plug>(lazysync-do) <C-R>=minimap#_lazysync_do()<CR>
   endif
 endfunction

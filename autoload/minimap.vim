@@ -127,7 +127,7 @@ function! minimap#_remote_pull_sync(id)
 endfunction
 
 function! minimap#_pull_sync(id)
-  echo printf('minimap: update required by %s', a:id)
+  "echo printf('minimap: update required by %s', a:id)
   let data = eval(remote_expr(a:id, 'minimap#_sync_data()'))
   if len(data)
     call minimap#_apply(data)

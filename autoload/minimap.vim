@@ -159,7 +159,7 @@ function! minimap#_set_view_range(line, col, start, end)
   silent execute printf('match Search /\(%s\|%s\).*/', p1, p2)
   " move cursor
   call cursor(a:line, a:col)
-  redraw
+  "redraw
 endfunction
 
 function! minimap#_set_autosync()

@@ -173,8 +173,8 @@ function! minimap#_set_autosync()
   let s:minimap_mode = 1
   augroup minimap_auto
     autocmd!
-    autocmd CursorMoved * call minimap#_lazysync()
-    autocmd CursorMovedI * call minimap#_lazysync()
+    autocmd CursorMoved * call minimap#_sync()
+    autocmd CursorMovedI * call minimap#_sync()
   augroup END
 endfunction
 

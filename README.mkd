@@ -21,23 +21,29 @@ then synchronizes the minimap buffer with the main editing buffer.
 - Download zip archive from GitHub
 - Unzip the archive
 
-  cd unzipped-dir
-  cp -r plugin ~/.vim/
-  cp -r autoload ~/.vim/
+```
+cd unzipped-dir
+cp -r plugin ~/.vim/
+cp -r autoload ~/.vim/
+```
 
 - Restart Gvim or MacVim
 
 ### Install with Janus
 
-  cd ~/.janus
-  git clone https://github.com/koron/minimap-vim.git minimap
+```
+cd ~/.janus
+git clone https://github.com/koron/minimap-vim.git minimap
+```
 
 ## How to use
 
 Open Gvim or MacVim
 
-  :e /some/long/file.code
-  :MinimapSync
+```
+:e /some/long/file.code
+:MinimapSync
+```
 
 ## Warning
 

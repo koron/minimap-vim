@@ -1,0 +1,24 @@
+# Minimap plugin for Vim
+
+For English please read README.mkd
+
+Minimap はファイルの概要を別ウィンドウに表示するプラグインです。Sublimeにある同名の機能と同等です。GvimもしくはMacVimで動作します。
+
+## まずはご覧あれ
+
+![Minimap Animation](minimapkoron.gif "MiniMap in MacVim")
+
+[Screenshot](minimapkoron.png)
+
+## 使い方
+
+  1. runtimepath にこのディレクトリを加えるなどしてインストール
+  2. gvimを起動する (香り屋版推奨というかそれしかテストしてない)
+  2. 適当なファイルを開く `:e $VIM/README.txt`
+  3. `:MinimapSync` を実行する
+
+ワオ!
+
+## 注意事項
+
+まだ実験段階なので、環境によっては動かないかも。許せ。

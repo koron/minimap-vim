@@ -1,14 +1,50 @@
-# minimap plugin for Vim
+# Minimap plugin for Vim
 
-## 使い方
+For Japanese please read README\_JA.mkd.
 
-  1. runtimepath にこのディレクトリを加えるなどしてインストール
-  2. gvimを起動する (香り屋版推奨というかそれしかテストしてない)
-  2. 適当なファイルを開く `:e $VIM/README.txt`
-  3. `:MinimapSync` を実行する
+Minimap is a file overview sidebar plugin for Vim like the Sublime's
+Minimap. It only works with Gvim or MacVim.
 
-ワオ!
+## How it works
 
-## 注意事項
+Minimap utilizes a new buffer and sets the fonts size to 3 points. It
+then synchronizes the Minimap buffer with the main editing buffer.
 
-まだ実験段階なので、環境によっては動かないかも。許せ。
+![Minimap Animation](minimapkoron.gif "MiniMap in MacVim")
+
+[Screenshot](minimapkoron.png)
+
+## Installation
+
+### Regular installation
+
+- Download zip archive from GitHub
+- Unzip the archive
+
+```
+cd unzipped-dir
+cp -r plugin ~/.vim/
+cp -r autoload ~/.vim/
+```
+
+- Restart Gvim or MacVim
+
+### Install with Janus
+
+```
+cd ~/.janus
+git clone https://github.com/koron/minimap-vim.git minimap
+```
+
+## How to use
+
+Open Gvim or MacVim
+
+```
+:e /some/long/file.code
+:MinimapSync
+```
+
+## Warning
+
+This plugin is very experimental. Not suitable for production.

@@ -6,9 +6,9 @@ Minimap はファイルの概要を別ウィンドウに表示するプラグイ
 
 ## まずはご覧あれ
 
-![Minimap Animation](minimapkoron.gif "MiniMap in MacVim")
+![Minimap Animation](image/animation.gif "MiniMap in MacVim")
 
-[Screenshot](minimapkoron.png)
+![Screenshot](image/screenshot.png)
 
 ## 使い方
 

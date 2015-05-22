@@ -10,9 +10,9 @@ Minimap. It only works with Gvim or MacVim.
 Minimap utilizes a new buffer and sets the fonts size to 3 points. It
 then synchronizes the Minimap buffer with the main editing buffer.
 
-![Minimap Animation](minimapkoron.gif "MiniMap in MacVim")
+![Minimap Animation](image/animation.gif "MiniMap in MacVim")
 
-[Screenshot](minimapkoron.png)
+![Screenshot](image/screenshot.png)
 
 ## Installation
 

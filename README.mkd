@@ -1,6 +1,6 @@
 # Minimap plugin for Vim
 
-For Japanese please read README\_JA.mkd.
+For Japanese please read [README\_JA.mkd](README_JA.mkd).
 
 Minimap is a file overview sidebar plugin for Vim like the Sublime's
 Minimap. It only works with Gvim or MacVim.

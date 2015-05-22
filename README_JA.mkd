@@ -1,6 +1,6 @@
 # Minimap plugin for Vim
 
-For English please read README.mkd
+For English please read [README.mkd](README.mkd).
 
 Minimap はファイルの概要を別ウィンドウに表示するプラグインです。Sublimeにある同名の機能と同等です。GvimもしくはMacVimで動作します。
 
